@@ -308,6 +308,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            min-height: 120px;
         }
 
         .gallery-item:hover {
@@ -346,7 +347,7 @@
             }
         }
 
- /* Footer */
+        /* Footer */
         .footer {
             background: #8B4513;
             color: white;
@@ -392,14 +393,29 @@
                 font-size: 1.3rem;
             }
             
+            /* Mobile gallery - smaller boxes */
             .gallery {
-                grid-template-columns: 1fr;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+            
+            .gallery-item {
+                aspect-ratio: 1;
+                min-height: 80px;
+                font-size: 0.9rem;
+            }
+            
+            /* Enable scroll animation on mobile */
+            .header {
+                min-height: 60vh;
+                padding: 2rem 1rem;
             }
         }
 
         @media (max-width: 480px) {
             .header {
                 padding: 2rem 1rem;
+                min-height: 50vh;
             }
             
             .event-item {
@@ -410,6 +426,25 @@
             .btn {
                 padding: 10px 16px;
                 font-size: 0.9rem;
+            }
+            
+            /* Very small gallery boxes for mobile */
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.5rem;
+            }
+            
+            .gallery-item {
+                min-height: 60px;
+                font-size: 0.8rem;
+                aspect-ratio: 1;
+            }
+        }
+
+        /* Desktop - disable scroll animation */
+        @media (min-width: 769px) {
+            .header-no-parallax {
+                transform: none !important;
             }
         }
 
@@ -450,10 +485,9 @@
     <div class="floating-petals" id="petals"></div>
 
     <!-- Header -->
-    <header class="header">
+    <header class="header" id="main-header">
         <h1 class="main-title">Sreejita ❤️ Sourav</h1>
         <p class="subtitle">🎊 শুভ বিবাহ 🎊</p>
-        <div class="scroll-indicator">⬇️</div>
     </header>
 
     <!-- Main Content -->
@@ -510,7 +544,7 @@
         <div class="card">
             <h2>📸 Bengali Memories</h2>
             <div class="gallery">
-                <div class="gallery-item">🐚 Test</div>
+                <div class="gallery-item">🚗 Test</div>
                 <div class="gallery-item">🔴 Test</div>
                 <div class="gallery-item">🎭 Test</div>
                 <div class="gallery-item">🍯 Test</div>
@@ -596,14 +630,38 @@
             });
         });
 
-        // Parallax effect for header
-        window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const header = document.querySelector('.header');
-            if (header) {
-                header.style.transform = `translateY(${scrolled * 0.5}px)`;
+        // Parallax effect for header - only on mobile devices
+        function handleParallax() {
+            const header = document.getElementById('main-header');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (isMobile) {
+                // Enable parallax on mobile
+                header.classList.remove('header-no-parallax');
+                window.addEventListener('scroll', parallaxScroll);
+            } else {
+                // Disable parallax on desktop
+                header.classList.add('header-no-parallax');
+                header.style.transform = 'translateY(0)';
+                window.removeEventListener('scroll', parallaxScroll);
             }
-        });
+        }
+
+        function parallaxScroll() {
+            const scrolled = window.pageYOffset;
+            const header = document.getElementById('main-header');
+            const isMobile = window.innerWidth <= 768;
+            
+            if (header && isMobile) {
+                header.style.transform = `translateY(${scrolled * 0.3}px)`;
+            }
+        }
+
+        // Initialize parallax handling
+        handleParallax();
+        
+        // Handle window resize
+        window.addEventListener('resize', handleParallax);
 
         // Add click effect to buttons
         document.querySelectorAll('.btn').forEach(btn => {
@@ -648,12 +706,10 @@
         `;
         document.head.appendChild(style);
 
-
-
         document.addEventListener('DOMContentLoaded', () => {
             const inviteCard = document.querySelector('.invite-card');
             if (inviteCard) {
-                observePoem.observe(inviteCard);
+                observer.observe(inviteCard);
             }
         });
     </script>
